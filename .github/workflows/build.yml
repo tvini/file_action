@@ -71,7 +71,7 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
-      - name: Download ffmpeg and pandoc (for the tests; the app downloads them on demand)
+      - name: Download ffmpeg and pandoc (bundled with the Windows app)
         shell: pwsh
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -88,6 +88,7 @@ jobs:
         run: |
           dotnet publish src/FileAction.App/FileAction.App.csproj -c Release -r win-x64 --self-contained -p:Version=$env:VERSION -o publish
           Copy-Item LICENSE, THIRD-PARTY-NOTICES.md publish/
+          if (Test-Path tools) { Copy-Item tools publish\ -Recurse -Force }
 
       - name: UI self-test
         shell: pwsh
@@ -134,7 +135,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw "7-Zip failed" }
           Get-ChildItem artifacts | ForEach-Object { "{0}  {1:N1} MB" -f $_.Name, ($_.Length / 1MB) }
           $setup = Get-Item "artifacts/FileAction-Setup-$env:VERSION.exe"
-          if ($setup.Length -gt 50MB) { throw ("The installer grew to {0:N1} MB (limit 50 MB)" -f ($setup.Length / 1MB)) }
+          if ($setup.Length -gt 150MB) { throw ("The installer grew to {0:N1} MB (limit 150 MB)" -f ($setup.Length / 1MB)) }
 
       - uses: actions/upload-artifact@v4
         with:

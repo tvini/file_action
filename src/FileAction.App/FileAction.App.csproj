@@ -52,4 +52,12 @@
     <ProjectReference Include="..\FileAction.Core\FileAction.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup Condition="Exists('$(MSBuildThisFileDirectory)..\..\tools\ffmpeg.exe')">
+    <None Include="$(MSBuildThisFileDirectory)..\..\tools\**\*">
+      <Link>tools\%(RecursiveDir)%(FileName)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

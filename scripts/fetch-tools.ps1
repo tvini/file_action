@@ -23,7 +23,16 @@ if ($env:GITHUB_TOKEN) { $headers['Authorization'] = "Bearer $($env:GITHUB_TOKEN
 function Get-Zip([string]$Url, [string]$Name) {
     $zip = Join-Path $temp "$Name.zip"
     Write-Host "Downloading $Url"
-    Invoke-WebRequest -Uri $Url -OutFile $zip -Headers $headers
+    if (Get-Command curl.exe -ErrorAction SilentlyContinue) {
+        $curlArgs = @('-f', '-L', '--retry', '3', '-A', 'FileAction-build', '-o', $zip, $Url)
+        if ($env:GITHUB_TOKEN) {
+            $curlArgs = @('-H', "Authorization: Bearer $($env:GITHUB_TOKEN)") + $curlArgs
+        }
+        & curl.exe @curlArgs
+        if ($LASTEXITCODE -ne 0) { throw "curl failed with exit code $LASTEXITCODE" }
+    } else {
+        Invoke-WebRequest -Uri $Url -OutFile $zip -Headers $headers -UseBasicParsing
+    }
     $dir = Join-Path $temp $Name
     Expand-Archive -Path $zip -DestinationPath $dir
     return $dir
@@ -37,7 +46,7 @@ try {
     Copy-Item $ffmpeg.FullName $Destination -Force
 
     # Pandoc: latest release from https://github.com/jgm/pandoc
-    $release = Invoke-RestMethod -Uri 'https://api.github.com/repos/jgm/pandoc/releases/latest' -Headers $headers
+    $release = Invoke-RestMethod -Uri 'https://api.github.com/repos/jgm/pandoc/releases/latest' -Headers $headers -UseBasicParsing
     $asset = $release.assets | Where-Object { $_.name -like 'pandoc-*-windows-x86_64.zip' } | Select-Object -First 1
     if (-not $asset) { throw 'No Windows asset in the latest pandoc release' }
     $pandocDir = Get-Zip $asset.browser_download_url 'pandoc'

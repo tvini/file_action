@@ -71,10 +71,10 @@ With several files selected, each one is converted separately; tools like “mer
 
 FileAction handles images, PDFs, spreadsheets, subtitles and archives on its own. Some formats need extra programs:
 
-- **FFmpeg** (audio and video, 34 MB) and **Pandoc** (documents, 35 MB) are downloaded the first time you need them: the wheel shows their slices dimmed with “get FFmpeg”, and dropping a file there asks once, downloads the tool (checked against its published SHA-256) and runs the conversion. If you already have them installed (e.g. `winget install Gyan.FFmpeg`), FileAction uses those,
-- **LibreOffice** (DOC, PPTX, ODS, documents and spreadsheets to PDF) has to be installed separately: `winget install TheDocumentFoundation.LibreOffice`.
+- **FFmpeg** (audio and video) and **Pandoc** (documents) are bundled directly inside the Windows installer into the `tools/` folder, so conversions work right out of the box with no extra downloads needed.
+- **LibreOffice** (DOC, PPTX, ODS, documents and spreadsheets to PDF) can be installed separately: `winget install TheDocumentFoundation.LibreOffice`.
 
-**Settings → Helper programs** shows what is missing and can download or install it for you. Keeping the tools out of the installer keeps it under 50 MB.
+**Settings → Helper programs** shows the status and paths of detected tools.
 
 ## Install
 
